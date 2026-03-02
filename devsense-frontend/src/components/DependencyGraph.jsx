@@ -21,7 +21,7 @@ export default function DependencyGraph({ dependencies }) {
       .style("background", "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)");
 
     // Create nodes with more variety
-    const nodes = dependencies.packages.slice(0, 20).map((pkg, i) => ({
+    const nodes = dependencies.packages.slice(0, 20).map((pkg) => ({
       id: pkg.name,
       group: pkg.type === 'production' ? 1 : 2,
       size: Math.random() * 15 + 15, // Random size for visual interest
@@ -118,7 +118,7 @@ export default function DependencyGraph({ dependencies }) {
       .attr("stroke", "#fff")
       .attr("stroke-width", 2)
       .style("filter", "drop-shadow(0 0 8px rgba(59, 130, 246, 0.5))")
-      .on("mouseenter", function(event, d) {
+      .on("mouseenter", function(_, d) {
         d3.select(this)
           .transition()
           .duration(200)
@@ -134,7 +134,7 @@ export default function DependencyGraph({ dependencies }) {
           (l.source.id === d.id || l.target.id === d.id) ? "#60a5fa" : "#4b5563"
         );
       })
-      .on("mouseleave", function(event, d) {
+      .on("mouseleave", function(_, d) {
         d3.select(this)
           .transition()
           .duration(200)

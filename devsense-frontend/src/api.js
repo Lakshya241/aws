@@ -1,8 +1,8 @@
 import axios from "axios";
 
-// base url can be configured via VITE_API_URL or default to localhost:8000
+// base url can be configured via VITE_API_URL or default to Render backend
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000",
+  baseURL: import.meta.env.VITE_API_URL || "https://devsense1.onrender.com",
 });
 
 export async function ingestRepo({ repo_url, project_name }) {
@@ -48,5 +48,12 @@ export async function submitFeedback({ project_name, rating, feedback_text, cate
 
 export async function getSettings() {
   const res = await API.get("/settings");
+  return res.data;
+}
+
+export async function getLogs({ project_name, limit = 100 }) {
+  const res = await API.get("/logs", {
+    params: { project_name, limit },
+  });
   return res.data;
 }

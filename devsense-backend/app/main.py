@@ -14,7 +14,13 @@ app = FastAPI(title="DevSense AI Backend")
 # allow frontend to communicate
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000", "*"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "https://*.vercel.app",
+        "https://*.onrender.com",
+        "*"  # Allow all for now, remove in production
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -51,14 +57,18 @@ def health_check():
 @app.post("/ingest")
 def ingest_repo(request: RepoRequest):
     try:
+        log_activity(request.project_name, "ingestion_started", {"repo_url": request.repo_url})
         result = ingest_repository(request.repo_url, request.project_name)
+        log_activity(request.project_name, "ingestion_completed", result)
         return {"message": "Repository ingested successfully", **result}
     except subprocess.TimeoutExpired:
+        log_activity(request.project_name, "ingestion_failed", {"error": "timeout"})
         raise HTTPException(status_code=504, detail="Repository clone timed out. The repository might be too large.")
     except Exception as exc:
         # Log the full error for debugging
         import traceback
         print(f"Ingestion error: {traceback.format_exc()}")
+        log_activity(request.project_name, "ingestion_failed", {"error": str(exc)})
         # Give user helpful feedback
         error_msg = str(exc)
         if "git" in error_msg.lower():
@@ -68,11 +78,13 @@ def ingest_repo(request: RepoRequest):
 
 @app.post("/query")
 def query_endpoint(request: QueryRequest):
+    log_activity(request.project_name, "query_submitted", {"query": request.query[:100]})
     response = query_codebase(
         project_name=request.project_name,
         session_id=request.session_id,
         query=request.query
     )
+    log_activity(request.project_name, "query_completed", {"query": request.query[:100]})
     return {"response": response}
 
 
@@ -265,3 +277,58 @@ def get_settings():
         "backend_version": "1.0.0",
         "status": "connected"
     }
+
+
+@app.get("/logs")
+def get_logs(project_name: str = "default", limit: int = 100):
+    """Get recent activity logs"""
+    import json
+    from pathlib import Path
+    from datetime import datetime
+    
+    logs_dir = Path("data/logs")
+    logs_dir.mkdir(exist_ok=True)
+    
+    log_file = logs_dir / f"{project_name}_logs.jsonl"
+    
+    if not log_file.exists():
+        return {"logs": [], "message": "No logs found"}
+    
+    logs = []
+    try:
+        with open(log_file, 'r', encoding='utf-8') as f:
+            for line in f:
+                if line.strip():
+                    logs.append(json.loads(line))
+        
+        # Return most recent logs first
+        logs = logs[-limit:][::-1]
+    except Exception as e:
+        print(f"Error reading logs: {e}")
+        return {"logs": [], "error": str(e)}
+    
+    return {"logs": logs, "total": len(logs)}
+
+
+def log_activity(project_name: str, action: str, details: dict = None):
+    """Helper function to log activities"""
+    import json
+    from pathlib import Path
+    from datetime import datetime
+    
+    logs_dir = Path("data/logs")
+    logs_dir.mkdir(exist_ok=True)
+    
+    log_file = logs_dir / f"{project_name}_logs.jsonl"
+    
+    log_entry = {
+        "timestamp": datetime.now().isoformat(),
+        "action": action,
+        "details": details or {}
+    }
+    
+    try:
+        with open(log_file, 'a', encoding='utf-8') as f:
+            f.write(json.dumps(log_entry) + '\n')
+    except Exception as e:
+        print(f"Error writing log: {e}")

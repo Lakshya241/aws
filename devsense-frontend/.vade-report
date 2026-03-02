@@ -1,0 +1,41 @@
+# Vercel Speed Insights Implementation
+
+Successfully implemented Vercel Speed Insights for the devsense-frontend project.
+
+## Changes Made
+
+### 1. Installed Package
+- Added `@vercel/speed-insights` v1.3.1 to project dependencies
+- Updated package.json and package-lock.json
+
+### 2. Modified Files
+- **src/App.jsx**: Added SpeedInsights component
+  - Imported `SpeedInsights` from `@vercel/speed-insights/react`
+  - Added `<SpeedInsights />` component alongside the existing `<Analytics />` component
+
+## Implementation Details
+
+The implementation follows the Vercel Speed Insights documentation for React applications:
+- Used the React-specific package (`@vercel/speed-insights/react`)
+- Added the component at the app root level in App.jsx
+- Placed it alongside the existing Vercel Analytics component for consistency
+
+## Build Verification
+
+- ✅ Build completed successfully (npm run build)
+- ✅ No new linting errors introduced (existing errors were pre-existing)
+- ✅ Package installation successful with no vulnerabilities
+
+## Next Steps
+
+After deploying to Vercel:
+1. Enable Speed Insights in the Vercel dashboard for this project
+2. The `/_vercel/speed-insights/script.js` route will be automatically added
+3. Performance metrics will begin tracking after deployment and user visits
+4. Data can be viewed in the Vercel dashboard under the "Speed Insights" tab
+
+## Notes
+
+- The project already had `@vercel/analytics` installed, so Speed Insights was added in a similar pattern
+- Speed Insights will only function when deployed to Vercel's platform
+- No additional configuration is required as the component uses sensible defaults

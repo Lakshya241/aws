@@ -14,8 +14,11 @@ import {
   Send,
   Search,
   ChevronRight,
+  Activity,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
+import LogsPanel from "../components/LogsPanel";
+import DependencyGraph from "../components/DependencyGraph";
 
 // API helpers
 import { queryCodebase, getArchitecture, ingestRepo, getDependencies, getFileTree, submitFeedback, getSettings } from "../api";
@@ -24,6 +27,7 @@ const sidebarItems = [
   { icon: BarChart3, label: "Project Analysis", id: "analysis" },
   { icon: Bug, label: "Debug Errors", id: "debug" },
   { icon: GitBranch, label: "Dependency Map", id: "dependencies" },
+  { icon: Activity, label: "Activity Logs", id: "logs" },
   { icon: BookOpen, label: "Onboarding Guide", id: "onboarding" },
   { icon: Database, label: "Knowledge Base", id: "knowledge" },
   { icon: Settings, label: "Settings", id: "settings" },
@@ -848,6 +852,13 @@ export default function Dashboard() {
                       </div>
                     </div>
 
+                    {/* Interactive Dependency Graph */}
+                    {dependencies.packages && dependencies.packages.length > 0 && (
+                      <div className="mb-6">
+                        <DependencyGraph dependencies={dependencies} />
+                      </div>
+                    )}
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="p-6 bg-white/5 border border-white/10 rounded-lg">
                         <h3 className="font-semibold text-white mb-4">Production Dependencies</h3>
@@ -891,6 +902,34 @@ export default function Dashboard() {
                     <div className="w-12 h-12 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                     <p className="text-gray-400">Loading dependencies...</p>
                   </div>
+                )}
+              </motion.div>
+            </div>
+          )}
+
+          {/* Activity Logs Section */}
+          {activeSection === "logs" && (
+            <div className="p-6 space-y-6">
+              <motion.div
+                className="p-6 rounded-2xl backdrop-blur-xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <div className="flex items-center gap-3 mb-6">
+                  <Activity className="w-8 h-8 text-purple-400" />
+                  <div className="flex-1">
+                    <h2 className="text-2xl font-bold text-white">Activity Logs</h2>
+                    <p className="text-gray-400 text-sm">Track all project activities in real-time</p>
+                  </div>
+                </div>
+
+                {!projectName ? (
+                  <div className="text-center py-12">
+                    <Activity className="w-16 h-16 mx-auto mb-4 opacity-50 text-gray-400" />
+                    <p className="text-gray-400">Please ingest a project first to see activity logs</p>
+                  </div>
+                ) : (
+                  <LogsPanel projectName={projectName} />
                 )}
               </motion.div>
             </div>

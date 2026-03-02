@@ -2,7 +2,7 @@ import axios from "axios";
 
 // base url can be configured via VITE_API_URL or default to Render backend
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "https://devsense1.onrender.com",
+  baseURL: import.meta.env.VITE_API_URL || "https://aws-4qm6.onrender.com",
 });
 
 export async function ingestRepo({ repo_url, project_name }) {

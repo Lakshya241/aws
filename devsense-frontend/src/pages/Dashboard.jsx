@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import LogsPanel from "../components/LogsPanel";
-import DependencyGraph from "../components/DependencyGraph";
+// import DependencyGraph from "../components/DependencyGraph"; // Temporarily disabled until d3 is installed
 
 // API helpers
 import { queryCodebase, getArchitecture, ingestRepo, getDependencies, getFileTree, submitFeedback, getSettings } from "../api";
@@ -853,11 +853,13 @@ export default function Dashboard() {
                     </div>
 
                     {/* Interactive Dependency Graph */}
+                    {/* Temporarily disabled until d3 is installed
                     {dependencies.packages && dependencies.packages.length > 0 && (
                       <div className="mb-6">
                         <DependencyGraph dependencies={dependencies} />
                       </div>
                     )}
+                    */}
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="p-6 bg-white/5 border border-white/10 rounded-lg">
